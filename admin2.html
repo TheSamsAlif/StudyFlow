@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyFlow Pro – অ্যাডমিন</title>
+    <style>
+        :root {
+            --bg: #0f1119;
+            --card-bg: rgba(25, 27, 38, 0.75);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text: #e8eaf0;
+            --text-secondary: #9ca0b5;
+            --accent: #e17055;
+            --accent2: #00cec9;
+            --radius: 20px;
+            --glass-blur: blur(20px);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            --font: 'Segoe UI', system-ui, sans-serif;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .bg-blobs {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .bg-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.35;
+            animation: float 20s infinite;
+        }
+        .bg-blob:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            background: #fc5c65;
+            top: -10%;
+            left: -10%;
+        }
+        .bg-blob:nth-child(2) {
+            width: 280px;
+            height: 280px;
+            background: #45aaf2;
+            bottom: -12%;
+            right: -8%;
+            animation-delay: -7s;
+        }
+        @keyframes float {
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+            50% {
+                transform: translate(30px, -20px) scale(1.03);
+            }
+        }
+        .app {
+            position: relative;
+            z-index: 1;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px 15px;
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            padding: 18px;
+            margin-bottom: 14px;
+            box-shadow: var(--shadow);
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            background: var(--accent);
+            color: #fff;
+            cursor: pointer;
+            font-family: var(--font);
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(225, 112, 85, 0.3);
+            white-space: nowrap;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(225, 112, 85, 0.4);
+        }
+        .btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--accent2);
+            color: var(--accent2);
+            box-shadow: 0 4px 12px rgba(0, 206, 201, 0.2);
+        }
+        .btn-outline:hover {
+            background: rgba(0, 206, 201, 0.1);
+            box-shadow: 0 6px 16px rgba(0, 206, 201, 0.3);
+        }
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 0.8rem;
+        }
+        .btn-danger {
+            background: #e74c3c;
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+        }
+        .btn-danger:hover {
+            box-shadow: 0 6px 16px rgba(231, 76, 60, 0.4);
+        }
+        .btn-success {
+            background: #27ae60;
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+        }
+        .btn-success:hover {
+            box-shadow: 0 6px 16px rgba(39, 174, 96, 0.4);
+        }
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            border-radius: 14px;
+            border: 1px solid var(--card-border);
+            background: var(--card-bg);
+            backdrop-filter: var(--glass-blur);
+            color: var(--text);
+            margin: 8px 0;
+            outline: none;
+            font-family: var(--font);
+        }
+        .input-field:focus {
+            border-color: var(--accent);
+        }
+        .hidden {
+            display: none !important;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius);
+            padding: 14px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+        .list-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--card-border);
+        }
+        .toast {
+            position: fixed;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 999;
+            background: #1a1d2e;
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            animation: toastIn 0.3s, toastOut 0.3s 2.2s forwards;
+            pointer-events: none;
+        }
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-blobs"><div class="bg-blob"></div><div class="bg-blob"></div></div>
+
+    <!-- LOGIN -->
+    <div id="loginScreen" style="display:flex;align-items:center;justify-content:center;min-height:100vh;position:relative;z-index:1;">
+        <div class="glass-card" style="width:340px;text-align:center;">
+            <h2 style="color:var(--accent);margin-bottom:6px;">🔐 অ্যাডমিন প্যানেল</h2>
+            <p style="color:var(--text-secondary);margin-bottom:16px;font-size:0.85rem;">StudyFlow Pro ম্যানেজমেন্ট</p>
+            <input type="text" id="adminUser" class="input-field" placeholder="অ্যাডমিন নাম" value="admin" autocomplete="username">
+            <div style="position:relative;">
+                <input type="password" id="adminPass" class="input-field" placeholder="পাসওয়ার্ড" value="admin123" autocomplete="current-password" style="padding-right:48px;">
+                <button type="button" id="toggleAdminPass" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.2rem;padding:6px 8px;color:var(--text-secondary);transition:0.2s;" title="পাসওয়ার্ড দেখুন/লুকান">👁️</button>
+            </div>
+            <button class="btn" id="btnLogin" style="width:100%;padding:14px 24px;font-size:1rem;">🔓 লগইন করুন</button>
+            <p style="margin-top:10px;font-size:0.75rem;color:var(--text-secondary);">ডিফল্ট: admin / admin123</p>
+            <p id="loginError" style="color:#e74c3c;font-size:0.8rem;margin-top:8px;display:none;"></p>
+        </div>
+    </div>
+
+    <!-- MAIN APP -->
+    <div id="mainApp" class="app hidden">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+            <div>
+                <strong style="font-size:1.4rem;">⚙️ অ্যাডমিন কন্ট্রোল</strong>
+                <div style="font-size:0.75rem;color:var(--text-secondary);">StudyFlow Pro</div>
+            </div>
+            <button class="btn btn-outline" id="btnLogout" style="padding:10px 20px;">🚪 লগআউট করুন</button>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats">
+            <div class="stat-card"><div class="stat-number" id="statCourses">0</div><small>কোর্স</small></div>
+            <div class="stat-card"><div class="stat-number" id="statAnnounce">0</div><small>অ্যানাউন্সমেন্ট</small></div>
+            <div class="stat-card"><div class="stat-number" id="statMotiv">0</div><small>মোটিভেশন</small></div>
+        </div>
+
+        <!-- COURSES -->
+        <div class="glass-card">
+            <h3 style="margin-bottom:8px;">📚 কোর্স ম্যানেজমেন্ট</h3>
+            <div id="courseList"></div>
+            <button class="btn btn-success" id="btnAddCourse" style="margin-top:12px;width:100%;">➕ নতুন কোর্স যোগ করুন</button>
+        </div>
+
+        <!-- ANNOUNCEMENTS -->
+        <div class="glass-card">
+            <h3 style="margin-bottom:8px;">📢 অ্যানাউন্সমেন্ট</h3>
+            <div id="announceList"></div>
+            <div style="display:flex;gap:10px;margin-top:12px;">
+                <input type="text" id="newAnnounce" class="input-field" placeholder="অ্যানাউন্সমেন্ট মেসেজ লিখুন..." style="margin:0;flex:1;">
+                <button class="btn" id="btnPushAnnounce" style="flex-shrink:0;padding:12px 20px;">📤 প্রকাশ করুন</button>
+            </div>
+        </div>
+
+        <!-- MOTIVATIONS -->
+        <div class="glass-card">
+            <h3 style="margin-bottom:8px;">💪 মোটিভেশনাল মেসেজ</h3>
+            <div id="motivationList"></div>
+            <div style="display:flex;gap:10px;margin-top:12px;">
+                <input type="text" id="newMotivation" class="input-field" placeholder="মোটিভেশনাল উক্তি লিখুন..." style="margin:0;flex:1;">
+                <button class="btn btn-success" id="btnPushMotivation" style="flex-shrink:0;padding:12px 20px;">➕ যোগ করুন</button>
+            </div>
+        </div>
+
+        <!-- STUDENT REPORT -->
+        <div class="glass-card">
+            <h3 style="margin-bottom:8px;">📊 স্টুডেন্ট রিপোর্ট</h3>
+            <p style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:10px;">স্টুডেন্টের ডেটা ফাইল আপলোড করে রিপোর্ট দেখুন</p>
+            <input type="file" id="studentFile" accept=".json" class="hidden">
+            <button class="btn" id="btnUploadReport" style="width:100%;">📂 JSON ফাইল আপলোড করুন</button>
+            <div id="reportArea" style="margin-top:12px;font-size:0.9rem;"></div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div class="glass-card">
+            <h3 style="margin-bottom:8px;">🔧 সেটিংস</h3>
+            <div style="margin-bottom:12px;">
+                <label style="font-weight:600;font-size:0.85rem;display:block;margin-bottom:6px;">🔑 অ্যাডমিন পাসওয়ার্ড পরিবর্তন</label>
+                <div style="position:relative;margin-bottom:8px;">
+                    <input type="password" id="newPass" class="input-field" placeholder="নতুন পাসওয়ার্ড লিখুন (ন্যূনতম ৪ অক্ষর)" style="padding-right:48px;">
+                    <button type="button" id="toggleNewPass" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.2rem;padding:6px 8px;color:var(--text-secondary);transition:0.2s;" title="পাসওয়ার্ড দেখুন/লুকান">👁️</button>
+                </div>
+                <div style="position:relative;margin-bottom:8px;">
+                    <input type="password" id="confirmPass" class="input-field" placeholder="নতুন পাসওয়ার্ড আবার লিখুন" style="padding-right:48px;">
+                    <button type="button" id="toggleConfirmPass" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:1.2rem;padding:6px 8px;color:var(--text-secondary);transition:0.2s;" title="পাসওয়ার্ড দেখুন/লুকান">👁️</button>
+                </div>
+                <button class="btn btn-icon-label" id="btnChangePass" style="width:100%;">
+                    <span class="btn-icon">🔒</span>
+                    <span>পাসওয়ার্ড আপডেট করুন</span>
+                </button>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-outline btn-icon-label" id="btnExportData" style="width:100%;">
+                    <span class="btn-icon">💾</span>
+                    <span>সম্পূর্ণ ডেটা ব্যাকআপ ডাউনলোড</span>
+                </button>
+                <button class="btn btn-outline btn-icon-label" id="btnImportData" style="width:100%;">
+                    <span class="btn-icon">📁</span>
+                    <span>ব্যাকআপ ফাইল থেকে ডেটা রিস্টোর</span>
+                </button>
+            </div>
+            <input type="file" id="adminImportFile" accept=".json" class="hidden">
+        </div>
+    </div>
+
+    <div id="toastContainer"></div>
+
+    <script>
+        (() => {
+            // ────────────── KEYS ──────────────
+            const CRED_KEY = 'admin_credentials';
+            const LOGGED_KEY = 'admin_logged';
+            const COURSES_KEY = 'admin_courses';
+            const ANNOUNCE_KEY = 'studyflow_announcements';
+            const MOTIV_KEY = 'student_motivations';
+            const REPORT_KEY = 'admin_report_count';
+
+            // ────────────── HELPERS ──────────────
+            const $ = id => document.getElementById(id);
+            const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch (e) { return d; } };
+            const save = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+            const genId = () => 'id_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+
+            function toast(msg) {
+                const el = document.createElement('div');
+                el.className = 'toast';
+                el.textContent = msg;
+                $('toastContainer').appendChild(el);
+                setTimeout(() => el.remove(), 2600);
+            }
+
+            function ensureDefaultCred() {
+                if (!localStorage.getItem(CRED_KEY)) {
+                    save(CRED_KEY, { username: 'admin', password: 'admin123' });
+                }
+            }
+
+            // ────────────── AUTH ──────────────
+            function doLogin() {
+                localStorage.setItem(LOGGED_KEY, 'true');
+                $('loginScreen').classList.add('hidden');
+                $('mainApp').classList.remove('hidden');
+                refreshAll();
+                toast('✅ লগইন সফল');
+            }
+
+            function doLogout() {
+                localStorage.removeItem(LOGGED_KEY);
+                $('mainApp').classList.add('hidden');
+                $('loginScreen').classList.remove('hidden');
+                $('loginError').style.display = 'none';
+                toast('👋 লগআউট সম্পন্ন');
+            }
+
+            function attemptLogin() {
+                const u = $('adminUser').value.trim();
+                const p = $('adminPass').value.trim();
+                if (!u || !p) {
+                    $('loginError').textContent = 'ইউজারনেম ও পাসওয়ার্ড দিন';
+                    $('loginError').style.display = 'block';
+                    return;
+                }
+                const cred = load(CRED_KEY, { username: 'admin', password: 'admin123' });
+                if (u === cred.username && p === cred.password) {
+                    $('loginError').style.display = 'none';
+                    doLogin();
+                } else {
+                    $('loginError').textContent = '❌ ভুল ইউজারনেম বা পাসওয়ার্ড';
+                    $('loginError').style.display = 'block';
+                }
+            }
+
+            // ────────────── REFRESH ──────────────
+            function refreshAll() {
+                const courses = load(COURSES_KEY, []);
+                const announcements = load(ANNOUNCE_KEY, []);
+                const motivations = load(MOTIV_KEY, []);
+                const reportCount = load(REPORT_KEY, 0);
+
+                $('statCourses').textContent = courses.length;
+                $('statAnnounce').textContent = announcements.length;
+                $('statMotiv').textContent = motivations.length;
+
+                // Courses
+                $('courseList').innerHTML = courses.length ? courses.map(c => `
+              <div class="list-item">
+                <div style="width:36px;height:36px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">${c.name.charAt(0)}</div>
+                <div style="flex:1;min-width:0;"><strong>${c.name}</strong><div style="font-size:0.72rem;color:var(--text-secondary);">${c.routineTemplate||'রুটিন নেই'} | ${c.topics?.join(', ')||'কোনো টপিক নেই'}</div></div>
+                <button class="btn btn-outline btn-sm" data-del="${c.id}">🗑</button>
+              </div>`).join('') : '<p style="color:var(--text-secondary);text-align:center;padding:10px;">কোনো কোর্স নেই</p>';
+                document.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
+                    save(COURSES_KEY, courses.filter(c => c.id !== b.dataset.del));
+                    refreshAll();
+                    toast('🗑 কোর্স ডিলিট হয়েছে');
+                });
+
+                // Announcements
+                $('announceList').innerHTML = announcements.length ? announcements.map(a => `
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--card-border);">
+                <span style="font-size:0.85rem;">💡 ${a.text}</span>
+                <button class="btn btn-outline btn-sm" data-adel="${a.id}" style="padding:2px 8px;">❌</button>
+              </div>`).join('') : '<p style="color:var(--text-secondary);text-align:center;">কোনো অ্যানাউন্সমেন্ট নেই</p>';
+                document.querySelectorAll('[data-adel]').forEach(b => b.onclick = () => {
+                    save(ANNOUNCE_KEY, announcements.filter(a => a.id !== b.dataset.adel));
+                    refreshAll();
+                    toast('অ্যানাউন্সমেন্ট ডিলিট');
+                });
+
+                // Motivations
+                $('motivationList').innerHTML = motivations.length ? motivations.map((m, i) => `
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--card-border);">
+                <span style="font-size:0.85rem;">💪 ${m}</span>
+                <button class="btn btn-outline btn-sm" data-motdel="${i}" style="padding:2px 8px;">❌</button>
+              </div>`).join('') : '<p style="color:var(--text-secondary);text-align:center;">কোনো মোটিভেশনাল মেসেজ নেই</p>';
+                document.querySelectorAll('[data-motdel]').forEach(b => b.onclick = () => {
+                    const idx = parseInt(b.dataset.motdel);
+                    motivations.splice(idx, 1);
+                    save(MOTIV_KEY, motivations);
+                    refreshAll();
+                    toast('মেসেজ ডিলিট');
+                });
+            }
+
+            // ────────────── EVENT BINDINGS ──────────────
+            $('btnLogin').onclick = attemptLogin;
+            $('adminPass').onkeydown = e => { if (e.key === 'Enter') attemptLogin(); };
+            $('btnLogout').onclick = doLogout;
+            
+            // Password toggle functionality
+            $('toggleAdminPass').onclick = () => {
+                const passInput = $('adminPass');
+                const toggleBtn = $('toggleAdminPass');
+                if (passInput.type === 'password') {
+                    passInput.type = 'text';
+                    toggleBtn.textContent = '🙈';
+                    toggleBtn.title = 'পাসওয়ার্ড লুকান';
+                } else {
+                    passInput.type = 'password';
+                    toggleBtn.textContent = '👁️';
+                    toggleBtn.title = 'পাসওয়ার্ড দেখুন';
+                }
+            };
+
+            $('btnAddCourse').onclick = () => {
+                const name = prompt('📚 কোর্সের নাম:');
+                if (!name || !name.trim()) return;
+                const topics = prompt('📝 টপিক (কমা দিয়ে):') || '';
+                const routine = prompt('📅 রুটিন টেমপ্লেট:') || '';
+                const courses = load(COURSES_KEY, []);
+                courses.push({
+                    id: genId(),
+                    name: name.trim(),
+                    topics: topics ? topics.split(',').map(s => s.trim()).filter(Boolean) : [],
+                    routineTemplate: routine.trim(),
+                    thumbnail: '',
+                    createdAt: Date.now()
+                });
+                save(COURSES_KEY, courses);
+                refreshAll();
+                toast('✅ কোর্স যোগ হয়েছে');
+            };
+
+            $('btnPushAnnounce').onclick = () => {
+                const text = $('newAnnounce').value.trim();
+                if (!text) return toast('⚠️ মেসেজ লিখুন');
+                const anns = load(ANNOUNCE_KEY, []);
+                anns.push({ id: genId(), text, date: Date.now(), type: 'admin' });
+                save(ANNOUNCE_KEY, anns);
+                $('newAnnounce').value = '';
+                refreshAll();
+                toast('📤 অ্যানাউন্সমেন্ট পুশ হয়েছে');
+            };
+            $('newAnnounce').onkeydown = e => { if (e.key === 'Enter') $('btnPushAnnounce').click(); };
+
+            $('btnPushMotivation').onclick = () => {
+                const text = $('newMotivation').value.trim();
+                if (!text) return toast('⚠️ উক্তি লিখুন');
+                const mot = load(MOTIV_KEY, []);
+                mot.push(text);
+                save(MOTIV_KEY, mot);
+                $('newMotivation').value = '';
+                refreshAll();
+                toast('💪 মোটিভেশন যোগ হয়েছে');
+            };
+            $('newMotivation').onkeydown = e => { if (e.key === 'Enter') $('btnPushMotivation').click(); };
+
+            $('btnUploadReport').onclick = () => $('studentFile').click();
+            $('studentFile').onchange = e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = () => {
+                    try {
+                        const d = JSON.parse(reader.result);
+                        const totalTasks = d.tasks?.length || 0;
+                        const completed = d.tasks?.filter(t => t.completed).length || 0;
+                        const totalMinutes = d.studyLog?.reduce((a, l) => a + (l.minutes || 0), 0) || 0;
+                        const streak = d.streakData?.count || d.streak?.count || 0;
+                        const subjects = d.mySubjects?.length || 0;
+                        $('reportArea').innerHTML = `
+                  <div style="background:rgba(0,184,148,0.1);border-radius:14px;padding:14px;">
+                    <strong>📊 স্টুডেন্ট রিপোর্ট</strong><br>
+                    📝 মোট টাস্ক: <b>${totalTasks}</b><br>
+                    ✅ কমপ্লিট: <b>${completed}</b> (${totalTasks>0?Math.round((completed/totalTasks)*100):0}%)<br>
+                    ⏱️ মোট স্টাডি: <b>${totalMinutes} মিনিট</b><br>
+                    🔥 স্ট্রিক: <b>${streak} দিন</b><br>
+                    📚 বিষয়: <b>${subjects}টি</b>
+                  </div>`;
+                        const count = load(REPORT_KEY, 0);
+                        save(REPORT_KEY, count + 1);
+                        refreshAll();
+                        toast('📊 রিপোর্ট লোড হয়েছে');
+                    } catch (err) { $('reportArea').innerHTML =
+                            '<p style="color:var(--accent);">❌ ফাইল ফরম্যাট সঠিক নয়। স্টুডেন্ট অ্যাপ থেকে এক্সপোর্ট করা JSON ফাইল দিন।</p>'; }
+                };
+                reader.readAsText(file);
+            };
+
+            $('btnChangePass').onclick = () => {
+                const np = $('newPass').value.trim();
+                const cp = $('confirmPass').value.trim();
+                if (!np) return toast('⚠️ নতুন পাসওয়ার্ড লিখুন');
+                if (np.length < 4) return toast('⚠️ কমপক্ষে ৪ অক্ষর');
+                if (np !== cp) return toast('⚠️ পাসওয়ার্ড মেলেনি');
+                const cred = load(CRED_KEY, { username: 'admin', password: 'admin123' });
+                cred.password = np;
+                save(CRED_KEY, cred);
+                $('newPass').value = '';
+                $('confirmPass').value = '';
+                toast('🔒 পাসওয়ার্ড পরিবর্তিত হয়েছে');
+            };
+            
+            // Password toggle functionality for new password
+            $('toggleNewPass').onclick = () => {
+                const passInput = $('newPass');
+                const toggleBtn = $('toggleNewPass');
+                if (passInput.type === 'password') {
+                    passInput.type = 'text';
+                    toggleBtn.textContent = '🙈';
+                    toggleBtn.title = 'পাসওয়ার্ড লুকান';
+                } else {
+                    passInput.type = 'password';
+                    toggleBtn.textContent = '👁️';
+                    toggleBtn.title = 'পাসওয়ার্ড দেখুন';
+                }
+            };
+            
+            // Password toggle functionality for confirm password
+            $('toggleConfirmPass').onclick = () => {
+                const passInput = $('confirmPass');
+                const toggleBtn = $('toggleConfirmPass');
+                if (passInput.type === 'password') {
+                    passInput.type = 'text';
+                    toggleBtn.textContent = '🙈';
+                    toggleBtn.title = 'পাসওয়ার্ড লুকান';
+                } else {
+                    passInput.type = 'password';
+                    toggleBtn.textContent = '👁️';
+                    toggleBtn.title = 'পাসওয়ার্ড দেখুন';
+                }
+            };
+
+            $('btnExportData').onclick = () => {
+                const data = {
+                    courses: load(COURSES_KEY, []),
+                    announcements: load(ANNOUNCE_KEY, []),
+                    motivations: load(MOTIV_KEY, []),
+                    credentials: load(CRED_KEY, {}),
+                    reportCount: load(REPORT_KEY, 0),
+                    exportDate: new Date().toISOString()
+                };
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+                a.download = 'admin_backup_' + new Date().toISOString().slice(0, 10) + '.json';
+                a.click();
+                toast('📥 ব্যাকআপ ডাউনলোড হয়েছে');
+            };
+
+            $('btnImportData').onclick = () => $('adminImportFile').click();
+            $('adminImportFile').onchange = e => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = () => {
+                    try {
+                        const d = JSON.parse(reader.result);
+                        if (d.courses) save(COURSES_KEY, d.courses);
+                        if (d.announcements) save(ANNOUNCE_KEY, d.announcements);
+                        if (d.motivations) save(MOTIV_KEY, d.motivations);
+                        if (d.credentials) save(CRED_KEY, d.credentials);
+                        if (d.reportCount !== undefined) save(REPORT_KEY, d.reportCount);
+                        refreshAll();
+                        toast('📤 ডেটা ইমপোর্ট সফল');
+                    } catch { toast('❌ ফাইল ফরম্যাট সঠিক নয়'); }
+                };
+                reader.readAsText(file);
+            };
+
+            // ────────────── INIT ──────────────
+            ensureDefaultCred();
+            if (localStorage.getItem(LOGGED_KEY) === 'true') {
+                const cred = load(CRED_KEY, null);
+                if (cred) {
+                    $('loginScreen').classList.add('hidden');
+                    $('mainApp').classList.remove('hidden');
+                    refreshAll();
+                } else {
+                    localStorage.removeItem(LOGGED_KEY);
+                }
+            }
+        })();
+    </script>
+</body>
+</html>
